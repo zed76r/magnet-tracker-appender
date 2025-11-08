@@ -1,0 +1,110 @@
+name: Build and Release
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Extract version from script
+      id: get_version
+      shell: pwsh
+      run: |
+        $content = Get-Content -Path "add_tracker.ps1" -Raw
+        if ($content -match '\$version\s*=\s*"([^"]+)"') {
+          $version = $matches[1]
+          Write-Output "version=$version" >> $env:GITHUB_OUTPUT
+          Write-Output "Version found: $version"
+        } else {
+          Write-Error "Version not found in script"
+          exit 1
+        }
+
+    - name: Install ps2exe
+      shell: pwsh
+      run: |
+        Install-Module -Name ps2exe -Force -Scope CurrentUser
+        Import-Module ps2exe
+
+    - name: Build EXE
+      shell: pwsh
+      run: |
+        $version = "${{ steps.get_version.outputs.version }}"
+        Invoke-ps2exe `
+          -inputFile ".\add_tracker.ps1" `
+          -outputFile ".\MagnetTrackerAppender.exe" `
+          -title "Magnet Tracker Appender" `
+          -description "Append trackers to magnet links" `
+          -version "$version" `
+          -product "Magnet Tracker Appender" `
+          -copyright "Copyright (c) 2025" `
+          -noConsole `
+          -noOutput `
+          -noError `
+          -requireAdmin
+
+    - name: Verify EXE exists
+      shell: pwsh
+      run: |
+        if (Test-Path ".\MagnetTrackerAppender.exe") {
+          Write-Output "EXE file created successfully"
+          Get-Item ".\MagnetTrackerAppender.exe" | Select-Object Name, Length, LastWriteTime
+        } else {
+          Write-Error "EXE file not found"
+          exit 1
+        }
+
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: v${{ steps.get_version.outputs.version }}
+        release_name: Release v${{ steps.get_version.outputs.version }}
+        body: |
+          ## 🎉 Release v${{ steps.get_version.outputs.version }}
+          
+          ### 📥 下载
+          
+          下载 `MagnetTrackerAppender.exe` 文件并直接运行。
+          
+          ### 🔄 更新内容
+          
+          请参见提交历史了解本次更新的详细内容。
+          
+          ---
+          
+          **完整更新日志**: https://github.com/${{ github.repository }}/commits/v${{ steps.get_version.outputs.version }}
+        draft: false
+        prerelease: false
+
+    - name: Upload Release Asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./MagnetTrackerAppender.exe
+        asset_name: MagnetTrackerAppender.exe
+        asset_content_type: application/octet-stream
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: MagnetTrackerAppender-v${{ steps.get_version.outputs.version }}
+        path: MagnetTrackerAppender.exe
+        retention-days: 30
