@@ -1,5 +1,5 @@
 ﻿# 版本信息
-$version = "1.0.0"
+$version = "1.0.1"
 
 # 加载Windows Forms
 Add-Type -AssemblyName System.Windows.Forms
