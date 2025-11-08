@@ -1,7 +1,7 @@
 # Magnet Tracker Appender
 
-[![Release](https://img.shields.io/github/v/release/yourusername/magnet-add-tracker)](https://github.com/yourusername/magnet-add-tracker/releases)
-[![License](https://img.shields.io/github/license/yourusername/magnet-add-tracker)](LICENSE)
+[![Release](https://img.shields.io/github/v/release/zed76r/magnet-tracker-appender)](https://github.com/zed76r/magnet-tracker-appender/releases)
+[![License](https://img.shields.io/github/license/zed76r/magnet-tracker-appender)](LICENSE)
 
 一个简单易用的 Magnet 链接 Tracker 追加工具,可以自动为你的 Magnet 链接追加最新的 Tracker 列表,提升 BT 下载速度。
 
@@ -19,7 +19,7 @@
 
 ### 方式一: 下载编译好的 EXE (推荐)
 
-直接从 [Releases](https://github.com/yourusername/magnet-add-tracker/releases/latest) 页面下载最新版本的 `MagnetTrackerAppender.exe`,双击运行即可。
+直接从 [Releases](https://github.com/zed76r/magnet-tracker-appender/releases/latest) 页面下载最新版本的 `MagnetTrackerAppender.exe`,双击运行即可。
 
 ### 方式二: 运行 PowerShell 脚本
 
@@ -52,8 +52,8 @@
 
 1. 克隆仓库:
    ```bash
-   git clone https://github.com/yourusername/magnet-add-tracker.git
-   cd magnet-add-tracker
+   git clone https://github.com/zed76r/magnet-tracker-appender.git
+   cd magnet-tracker-appender
    ```
 
 2. 安装 ps2exe:
