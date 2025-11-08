@@ -9,6 +9,9 @@ on:
       - 'docs/**'
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: windows-latest
@@ -67,14 +70,11 @@ jobs:
           exit 1
         }
 
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Create Release and Upload Assets
+      uses: softprops/action-gh-release@v2
       with:
         tag_name: v${{ steps.get_version.outputs.version }}
-        release_name: Release v${{ steps.get_version.outputs.version }}
+        name: Release v${{ steps.get_version.outputs.version }}
         body: |
           ## 🎉 Release v${{ steps.get_version.outputs.version }}
           
@@ -89,18 +89,10 @@ jobs:
           ---
           
           **完整更新日志**: https://github.com/${{ github.repository }}/commits/v${{ steps.get_version.outputs.version }}
+        files: |
+          MagnetTrackerAppender.exe
         draft: false
         prerelease: false
-
-    - name: Upload Release Asset
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./MagnetTrackerAppender.exe
-        asset_name: MagnetTrackerAppender.exe
-        asset_content_type: application/octet-stream
 
     - name: Upload artifact
       uses: actions/upload-artifact@v4
